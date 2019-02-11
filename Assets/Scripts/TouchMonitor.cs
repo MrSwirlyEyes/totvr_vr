@@ -40,10 +40,10 @@ public class TouchMonitor : MonoBehaviour {
 
 		short setVibe = map(pressure, 0, maxPressure, minVibe, maxVibe);
 
-		Debug.Log (collision.contacts[0].thisCollider.name + " hit " + collision.collider.name);
+		// Debug.Log (collision.contacts[0].thisCollider.name + " hit " + collision.collider.name);
 //		Debug.Log ("Impulse is: " + collision.impulse.magnitude);
 //		Debug.Log ("Velocity is: " + collision.relativeVelocity.magnitude);
-		Debug.Log ("Pressure is: " + pressure);
+		// Debug.Log ("Pressure is: " + pressure);
 		if (Communicator.instance.touching) {
 			setVibes (collision.contacts[0].thisCollider.name, setVibe);
 		}

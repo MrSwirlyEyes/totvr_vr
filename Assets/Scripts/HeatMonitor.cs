@@ -14,7 +14,6 @@ public class HeatMonitor : MonoBehaviour {
 	void OnTriggerEnter(Collider other) {
 		if (other.GetComponentInParent<HeatSource> ()) {
 			sources.Add (other);
-			Debug.Log ("ADD SOURCE");
 		}
 	}
 
@@ -22,9 +21,7 @@ public class HeatMonitor : MonoBehaviour {
 
 	void OnTriggerExit(Collider other) {
 		sources.Remove (other);
-		Debug.Log ("REMOVE SOURCE");
 	}
-
 	
 
 	/* For each of the contributing sources, find its contribution to each finger.

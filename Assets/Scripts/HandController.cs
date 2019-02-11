@@ -23,6 +23,9 @@ public class HandController : MonoBehaviour {
 	/* For each finger, knuckle 1 is closest to the palm
 	 * knuckle 3 right below the fingernail
 	 */
+	 // These public transforms are assigned to references
+	 // to the Hand Model knuckles in Unity's configuration
+	 // gui, as indicated in figure ##
 	public Transform index1;
 	public Transform index2;
 	public Transform index3;
@@ -47,6 +50,7 @@ public class HandController : MonoBehaviour {
 	/* Bend the fingers in accordance with the values read from hardware */
 	void Update () {
 		if (Communicator.instance.bending) {
+			// Extract the current flex value of the index finger from the Communicator, and map it to a rotation
 			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
 			index1.localEulerAngles = new Vector3 (0, 50, indexRot);
 			index2.localEulerAngles = new Vector3 (0, 0, indexRot);
