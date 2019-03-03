@@ -31,7 +31,7 @@ public class Communicator : MonoBehaviour {
 	/* are we detecting the temperature emission of in-game objects? */
 	public bool heating = true;
 
-	private int numSensors = 5;
+	private int numSensors = 10;
 
 	/* Stores flex sensor values received from glove to be applied to hand model knuckles */
 	public struct KnuckleValues {
@@ -48,10 +48,14 @@ public class Communicator : MonoBehaviour {
 		public short index, middle, ring, pinky, thumb;
 	}
 
+	public struct DirectionValues {
+		public short index, middle, ring, pinky, thumb, wrist;
+	}
+
 	public KnuckleValues knuckles;
 	public VibeValues vibes;
 	public HeatValues heats;
-
+	public DirectionValues dires;
 
 	/* tracks whether we are waiting for a response from the glove, to ensure clean handoffs
 	 * we exchange between reading and writing - attempting both concurrently caused significant
@@ -107,8 +111,9 @@ public class Communicator : MonoBehaviour {
 
 	/* Write bytes to the hardware */
 	public void WriteToArduino() {
-		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky
-											/*heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky */};
+		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
+											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky,
+											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
 		byte[] bytes = new byte[numSensors * sizeof(short)];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
 		Debug.Log ("Writing");

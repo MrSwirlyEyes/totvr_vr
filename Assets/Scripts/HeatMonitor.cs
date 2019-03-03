@@ -59,11 +59,11 @@ public class HeatMonitor : MonoBehaviour {
 		Communicator.instance.heats.pinky = (short) (pinkySum / sources.Count);
 
 		//Debug.Log ("Temperature on Thumb: " + (short)(thumbSum / sources.Count));
-		thumbText.text = Convert.ToString((short)(thumbSum / sources.Count), 10);
-		indexText.text = Convert.ToString((short)(indexSum / sources.Count), 10);
-		middleText.text = Convert.ToString((short)(middleSum / sources.Count), 10);
-		ringText.text = Convert.ToString((short)(ringSum / sources.Count), 10);
-		pinkyText.text = Convert.ToString((short)(pinkySum / sources.Count), 10);
+//		thumbText.text = Convert.ToString((short)(thumbSum / sources.Count), 10);
+//		indexText.text = Convert.ToString((short)(indexSum / sources.Count), 10);
+//		middleText.text = Convert.ToString((short)(middleSum / sources.Count), 10);
+//		ringText.text = Convert.ToString((short)(ringSum / sources.Count), 10);
+//		pinkyText.text = Convert.ToString((short)(pinkySum / sources.Count), 10);
 
 	}
 
