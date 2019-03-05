@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using System.IO.Ports;
+using UnityEngine.UI;
 
 public class Communicator : MonoBehaviour {
 
@@ -32,6 +33,9 @@ public class Communicator : MonoBehaviour {
 	public bool heating = true;
 
 	private int numSensors = 10;
+
+	public bool calibrate = true;
+	public Text instructions = "";
 
 	/* Stores flex sensor values received from glove to be applied to hand model knuckles */
 	public struct KnuckleValues {
@@ -77,6 +81,11 @@ public class Communicator : MonoBehaviour {
 		}
 
 		setDefaults ();
+
+		if (calibrate) {
+			calibrate();
+			instructions.text = "";
+		}
 	}
 
 
@@ -86,7 +95,7 @@ public class Communicator : MonoBehaviour {
 	void Update() {
 
 		if (communicating && !reading) {
-			WriteToArduino ();
+			WriteToArduino (0xBEEF);
 			reading = true;
 			StartCoroutine (
 				ReadFromArduino (handleData)
@@ -110,8 +119,9 @@ public class Communicator : MonoBehaviour {
 
 
 	/* Write bytes to the hardware */
-	public void WriteToArduino() {
-		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
+	public void WriteToArduino(short msgType) {
+		short[] sendValues = new short[] {	msgType,
+											vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
 											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky
 											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
 		byte[] bytes = new byte[sendValues.Length * sizeof(short)];
@@ -200,6 +210,38 @@ public class Communicator : MonoBehaviour {
 		vibes.middle = 0;
 		vibes.ring = 0;
 		vibes.pinky = 0;
+	}
+
+
+	void calibrate() {
+		string response = null;
+
+		instructions.text = "Hold your hand flat";
+		writeToArduino(0xDEAD);
+
+		while (!response) {
+			try {
+				/* read a string from the stream */
+				response = stream.ReadLine ();
+			} catch (TimeoutException) {
+				response = null;
+			}
+		}
+		response = null;
+
+		instructions.text = "Make a fist";
+		writeToArduino(0xFEED)
+		while (!response) {
+			try {
+				/* read a string from the stream */
+				response = stream.ReadLine ();
+			} catch (TimeoutException) {
+				response = null;
+			}
+		}
+
+		instructions.text = "Calibration complete!";
+		// pause for a second?
 	}
 
 } /* END COMMUNICATOR CLASS */
