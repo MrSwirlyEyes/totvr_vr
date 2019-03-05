@@ -56,35 +56,35 @@ public class TouchMonitor : MonoBehaviour {
 		case "RightHandThumb3":
 		case "RightHandThumb4":
 			Communicator.instance.vibes.thumb = value;
-			thumbText.text = Convert.ToString((short)value, 10);
+//			thumbText.text = Convert.ToString((short)value, 10);
 			break;
 		case "RightHandIndex1":
 		case "RightHandIndex2":
 		case "RightHandIndex3":
 		case "RightHandIndex4":
 			Communicator.instance.vibes.index = value;
-			indexText.text = Convert.ToString((short)value, 10);
+//			indexText.text = Convert.ToString((short)value, 10);
 			break;
 		case "RightHandMiddle1":
 		case "RightHandMiddle2":
 		case "RightHandMiddle3":
 		case "RightHandMiddle4":
 			Communicator.instance.vibes.middle = value;
-			middleText.text = Convert.ToString((short)value, 10);
+//			middleText.text = Convert.ToString((short)value, 10);
 			break;
 		case "RightHandRing1":
 		case "RightHandRing2":
 		case "RightHandRing3":
 		case "RightHandRing4":
 			Communicator.instance.vibes.ring = value;
-			ringText.text = Convert.ToString((short)value, 10);
+//			ringText.text = Convert.ToString((short)value, 10);
 			break;
 		case "RightHandPinky1":
 		case "RightHandPinky2":
 		case "RightHandPinky3":
 		case "RightHandPinky4":
 			Communicator.instance.vibes.pinky = value;
-			pinkyText.text = Convert.ToString((short)value, 10);
+//			pinkyText.text = Convert.ToString((short)value, 10);
 			break;
 		default:
 			Communicator.instance.vibes.thumb = value;
@@ -92,11 +92,11 @@ public class TouchMonitor : MonoBehaviour {
 			Communicator.instance.vibes.middle = value;
 			Communicator.instance.vibes.ring = value;
 			Communicator.instance.vibes.pinky = value;
-			thumbText.text = Convert.ToString((short)value, 10);
-			indexText.text = Convert.ToString((short)value, 10);
-			middleText.text = Convert.ToString((short)value, 10);
-			ringText.text = Convert.ToString((short)value, 10);
-			pinkyText.text = Convert.ToString((short)value, 10);
+//			thumbText.text = Convert.ToString((short)value, 10);
+//			indexText.text = Convert.ToString((short)value, 10);
+//			middleText.text = Convert.ToString((short)value, 10);
+//			ringText.text = Convert.ToString((short)value, 10);
+//			pinkyText.text = Convert.ToString((short)value, 10);
 			break;
 		}
 	}
