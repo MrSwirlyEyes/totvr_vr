@@ -112,9 +112,9 @@ public class Communicator : MonoBehaviour {
 	/* Write bytes to the hardware */
 	public void WriteToArduino() {
 		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
-											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky,
+											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky
 											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
-		byte[] bytes = new byte[numSensors * sizeof(short)];
+		byte[] bytes = new byte[sendValues.Length * sizeof(short)];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
 		Debug.Log ("Writing");
 		stream.Write(bytes,0,bytes.Length);
