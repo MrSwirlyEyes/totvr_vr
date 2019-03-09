@@ -66,6 +66,7 @@ public class Communicator : MonoBehaviour {
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
+	private int calibration = -1;
 
 	
 	/* Set the global instance of the Communicator and open the stream to the hardwware */
@@ -81,11 +82,6 @@ public class Communicator : MonoBehaviour {
 		}
 
 		setDefaults ();
-
-		if (calibrate) {
-			calibrateFlex();
-			instructions.text = "";
-		}
 	}
 
 
@@ -93,24 +89,31 @@ public class Communicator : MonoBehaviour {
 	 * or vice versa).
 	 */
 	void Update() {
-
-		if (communicating && !reading) {
-			short cmd = 0x1000; // (short)48879;
-			WriteToArduino (cmd); // 0xBEEF in base 10
-			reading = true;
-			StartCoroutine (
-				ReadFromArduino (handleData)
-			);
+		if (calibration == -1) {
+			instructions.text = "Hold your hand flat";
+			calibrateMax();
+		} else if (calibration == 0) {
+			instructions.text = "Make a fist";
+			calibrateMin();
+		} else if (calibration == 1) {
+			instructions.text = "Calibration complete!";
+		} else {
+			if (communicating && !reading) {
+				short cmd = 0x1000; // (short)48879;
+				WriteToArduino (cmd); // 0xBEEF in base 10
+				reading = true;
+				StartCoroutine (
+					ReadFromArduino (handleData)
+				);
+			}
 		}
 	}
 
 
 	/* Open a stream to to given port */
 	public void Open() {
-		Debug.Log("Opening COM");
 		stream = new SerialPort (port, baudrate);
 		stream.ReadTimeout = 10;
-		Debug.Log("wew");
 		stream.Open ();
 	}
 
@@ -217,10 +220,9 @@ public class Communicator : MonoBehaviour {
 	}
 
 
-	void calibrateFlex() {
+	void calibrateMax() {
 		string response = null;
 
-		instructions.text = "Hold your hand flat";
 		WriteToArduino((short) 0x0100);
 
 		while (String.IsNullOrEmpty(response)) {
@@ -231,10 +233,15 @@ public class Communicator : MonoBehaviour {
 				response = null;
 			}
 		}
-		response = null;
 
-		instructions.text = "Make a fist";
+		calibration = 0;
+	}
+
+	void calibrateMin() {
+		string response = null;
+
 		WriteToArduino((short) 0x0010);
+
 		while (String.IsNullOrEmpty(response)) {
 			try {
 				/* read a string from the stream */
@@ -243,9 +250,9 @@ public class Communicator : MonoBehaviour {
 				response = null;
 			}
 		}
-
-		instructions.text = "Calibration complete!";
 		// pause for a second?
+
+		calibration = 1;
 	}
 
 } /* END COMMUNICATOR CLASS */
