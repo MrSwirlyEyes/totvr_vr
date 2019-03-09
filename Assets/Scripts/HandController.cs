@@ -24,6 +24,9 @@ public class HandController : MonoBehaviour {
 	/* For each finger, knuckle 1 is closest to the palm
 	 * knuckle 3 right below the fingernail
 	 */
+	 // These public transforms are assigned to references
+	 // to the Hand Model knuckles in Unity's configuration
+	 // gui, as indicated in figure ##
 	public Transform index1;
 	public Transform index2;
 	public Transform index3;
