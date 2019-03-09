@@ -11,15 +11,16 @@ using UnityEngine;
 
 public class HandController : MonoBehaviour {
 
-	int [] thumbRange		= { 90, 235 };
-	int [] indexRange		= { 236, 308 };
-	int [] middleRange		= { 236, 300 };
-	int [] ringRange		= { 190, 300 };
-	int [] pinkyRange		= { 119, 276 };
+//	int [] thumbRange		= { 90, 235 };
+//	int [] indexRange		= { 236, 308 };
+//	int [] middleRange		= { 236, 300 };
+//	int [] ringRange		= { 190, 300 };
+//	int [] pinkyRange		= { 119, 276 };
+//
+//	int [] fingerRange		= { 0, 90 };
+//	int [] thRange			= { 0, 90 };
 
-	int [] fingerRange		= { 0, 90 };
-	int [] thRange			= { 0, 90 };
-
+	short maxRot = 90;
 	/* For each finger, knuckle 1 is closest to the palm
 	 * knuckle 3 right below the fingernail
 	 */
@@ -47,30 +48,35 @@ public class HandController : MonoBehaviour {
 	/* Bend the fingers in accordance with the values read from hardware */
 	void Update () {
 		if (Communicator.instance.bending) {
-			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
+//			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
+			int thumbRot = maxRot - Communicator.instance.knuckles.thumb;
+			thumb1.localEulerAngles = new Vector3 (0, 50, thumbRot/4);
+			thumb2.localEulerAngles = new Vector3 (0, 0, thumbRot);
+			thumb3.localEulerAngles = new Vector3 (0, 0, thumbRot);
+
+//			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
+			int indexRot = maxRot - Communicator.instance.knuckles.index;
 			index1.localEulerAngles = new Vector3 (0, 50, indexRot);
 			index2.localEulerAngles = new Vector3 (0, 0, indexRot);
 			index3.localEulerAngles = new Vector3 (0, 0, indexRot/2);
 
-			int middleRot = mapInvert (Communicator.instance.knuckles.middle, middleRange [0], middleRange [1], fingerRange[0], fingerRange[1]);
+//			int middleRot = mapInvert (Communicator.instance.knuckles.middle, middleRange [0], middleRange [1], fingerRange[0], fingerRange[1]);
+			int middleRot = maxRot - Communicator.instance.knuckles.middle;
 			middle1.localEulerAngles = new Vector3 (0, 50, middleRot);
 			middle2.localEulerAngles = new Vector3 (0, 0, middleRot);
 			middle3.localEulerAngles = new Vector3 (0, 0, middleRot/2);
 
-			int ringRot = mapInvert (Communicator.instance.knuckles.ring, ringRange [0], ringRange [1], fingerRange[0], fingerRange[1]);
+//			int ringRot = mapInvert (Communicator.instance.knuckles.ring, ringRange [0], ringRange [1], fingerRange[0], fingerRange[1]);
+			int ringRot = maxRot - Communicator.instance.knuckles.ring;
 			ring1.localEulerAngles = new Vector3 (0, 50, ringRot);
 			ring2.localEulerAngles = new Vector3 (0, 0, ringRot);
 			ring3.localEulerAngles = new Vector3 (0, 0, ringRot/2);
 
-			int pinkyRot = mapInvert (Communicator.instance.knuckles.pinky, pinkyRange [0], pinkyRange [1], fingerRange[0], fingerRange[1]);
+//			int pinkyRot = mapInvert (Communicator.instance.knuckles.pinky, pinkyRange [0], pinkyRange [1], fingerRange[0], fingerRange[1]);
+			int pinkyRot = maxRot - Communicator.instance.knuckles.pinky;
 			pinky1.localEulerAngles = new Vector3 (0, 50, pinkyRot);
 			pinky2.localEulerAngles = new Vector3 (0, 0, pinkyRot);
 			pinky3.localEulerAngles = new Vector3 (0, 0, pinkyRot/2);
-
-			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
-			thumb1.localEulerAngles = new Vector3 (0, 50, thumbRot/4);
-			thumb2.localEulerAngles = new Vector3 (0, 0, thumbRot);
-			thumb3.localEulerAngles = new Vector3 (0, 0, thumbRot);
 		}
 	}
 
@@ -87,5 +93,17 @@ public class HandController : MonoBehaviour {
 		float stretched = slope * (x-in_min);
 		float b = ((float)out_max / in_min / slope);
 		return out_max - (int)(stretched+b);
+	}
+
+	short map(short x, int in_min, int in_max, int out_min, int out_max) {
+		float slope = (float)(out_max - out_min)/(in_max-in_min);
+		float stretched = slope * (x-in_min);
+		short returnable = (short)(stretched);
+		if (returnable > out_max)
+			return (short)out_max;
+		if (returnable < out_min)
+			return (short)out_min;
+		else
+			return returnable;
 	}
 }

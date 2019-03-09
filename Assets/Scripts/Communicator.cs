@@ -31,7 +31,7 @@ public class Communicator : MonoBehaviour {
 	/* are we detecting the temperature emission of in-game objects? */
 	public bool heating = true;
 
-	private int numSensors = 10;
+	private int numSensors = 5;
 
 	/* Stores flex sensor values received from glove to be applied to hand model knuckles */
 	public struct KnuckleValues {
@@ -111,14 +111,13 @@ public class Communicator : MonoBehaviour {
 
 	/* Write bytes to the hardware */
 	public void WriteToArduino() {
-		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
-											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky,
-											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
+		short[] sendValues = new short[] {	vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky
+											/*heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky */
+											/*dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */};
 		byte[] bytes = new byte[numSensors * sizeof(short)];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
-		Debug.Log ("Writing");
+		Debug.Log ("Writing " + sendValues[0] + ',' + sendValues[1] + ',' + sendValues[2] + ',' + sendValues[3] + ',' + sendValues[4]);
 		stream.Write(bytes,0,bytes.Length);
-//		stream.BaseStream.Flush ();
 	}
 
 
@@ -126,7 +125,6 @@ public class Communicator : MonoBehaviour {
 	/* Write a string to the hardware */
 	public void WriteToArduino(string message) {
 		stream.WriteLine(message);
-		//		stream.BaseStream.Flush ();
 	}
 
 
@@ -172,16 +170,19 @@ public class Communicator : MonoBehaviour {
 	void handleData(string inData) {
 		char[] delimiters = { ',' };
 		string[] values = inData.Split (delimiters);
+
+		if (values.Length == 5) {
+			try {
+				knuckles.thumb	= System.Convert.ToInt32 (values [0]);
+				knuckles.index	= System.Convert.ToInt32 (values [1]);
+				knuckles.middle	= System.Convert.ToInt32 (values [2]);
+				knuckles.ring	= System.Convert.ToInt32 (values [3]);
+				knuckles.pinky	= System.Convert.ToInt32 (values [4]);
+			} catch {
+			}
+		}
 		Debug.Log("Receiving " + inData);
 
-		try {
-			knuckles.thumb	= System.Convert.ToInt32 (values [0]);
-			knuckles.index	= System.Convert.ToInt32 (values [1]);
-			knuckles.middle	= System.Convert.ToInt32 (values [2]);
-			knuckles.ring	= System.Convert.ToInt32 (values [3]);
-			knuckles.pinky	= System.Convert.ToInt32 (values [4]);
-		} catch {
-		}
 //		Debug.Log ("Index: " + knuckles.index);
 	}
 
