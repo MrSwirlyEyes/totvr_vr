@@ -61,11 +61,11 @@ public class HeatMonitor : MonoBehaviour {
 		Communicator.instance.heats.ring = map((short) (ringSum / sources.Count),temp_min, temp_max, tec_min, tec_max);
 		Communicator.instance.heats.pinky = map((short) (pinkySum / sources.Count),temp_min, temp_max, tec_min, tec_max);
 
-		Debug.Log ("Temperatures: " + Communicator.instance.heats.thumb + ',' 
-									+ Communicator.instance.heats.index + ','
-									+ Communicator.instance.heats.middle + ','
-									+ Communicator.instance.heats.ring + ','
-									+ Communicator.instance.heats.pinky);
+//		Debug.Log ("Temperatures: " + Communicator.instance.heats.thumb + ',' 
+//									+ Communicator.instance.heats.index + ','
+//									+ Communicator.instance.heats.middle + ','
+//									+ Communicator.instance.heats.ring + ','
+//									+ Communicator.instance.heats.pinky);
 		
 //		thumbText.text = Convert.ToString((short)(thumbSum / sources.Count), 10);
 //		indexText.text = Convert.ToString((short)(indexSum / sources.Count), 10);

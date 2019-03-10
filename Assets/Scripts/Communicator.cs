@@ -66,10 +66,10 @@ public class Communicator : MonoBehaviour {
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
-	private int calibration = -1;
+	private int calibration = 4;
 
 	
-	/* Set the global instance of the Communicator and open the stream to the hardwware */
+	/* Set the global instance of the Communicator and open the stream to the hardware */
 	void Start () {
 		if (instance == null) {
 			instance = this;
@@ -80,7 +80,7 @@ public class Communicator : MonoBehaviour {
 		if (communicating) {
 			Open ();
 		}
-
+		instructions.text = "Greetings";
 		setDefaults ();
 	}
 
@@ -90,20 +90,37 @@ public class Communicator : MonoBehaviour {
 	 */
 	void Update() {
 		if (calibration == -1) {
+			Debug.Log("Sending Max Calibrate");
 			instructions.text = "Hold your hand flat";
-			calibrateMax();
-		} else if (calibration == 0) {
-			instructions.text = "Make a fist";
-			calibrateMin();
+			WriteToArduino((short) 256);
+			calibration++;
+			StartCoroutine (
+				ReadFromArduino (emptyFunction, 0)
+			);
+
+		// skip 0 - 0 waits for readfromarduino to finish
+		} else if (calibration == 0 || calibration == 2) {
+			Debug.Log(calibration + " Waiting for Arduino");
 		} else if (calibration == 1) {
+			Debug.Log("Sending Min Calibrate");
+			instructions.text = "Make a fist";
+			WriteToArduino((short) 128);
+			calibration++;
+			StartCoroutine (
+				ReadFromArduino (emptyFunction, 0)
+			);
+		
+		// skip 2 - 2 waits for readfromarduino to finish
+		} else if (calibration == 3) {
 			instructions.text = "Calibration complete!";
-		} else {
+			calibration++;
+		} else if (calibration == 4) {
 			if (communicating && !reading) {
-				short cmd = 0x1000; // (short)48879;
+				short cmd = 64; // (short)48879;
 				WriteToArduino (cmd); // 0xBEEF in base 10
 				reading = true;
 				StartCoroutine (
-					ReadFromArduino (handleData)
+					ReadFromArduino (handleData, 50)
 				);
 			}
 		}
@@ -127,12 +144,12 @@ public class Communicator : MonoBehaviour {
 	/* Write bytes to the hardware */
 	public void WriteToArduino(short msgType) {
 		short[] sendValues = new short[] {	msgType,
-											vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
-											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky
+											vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky
+											/* heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky */
 											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
 		byte[] bytes = new byte[sendValues.Length * sizeof(short)];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
-		Debug.Log ("Writing " + sendValues[0] + ',' + sendValues[1] + ',' + sendValues[2] + ',' + sendValues[3] + ',' + sendValues[4]);
+		Debug.Log ("Writing " + sendValues[0] + ',' + sendValues[1] + ',' + sendValues[2] + ',' + sendValues[3] + ',' + sendValues[4] + ',' + sendValues[5]);
 		stream.Write(bytes,0,bytes.Length);
 	}
 
@@ -148,7 +165,7 @@ public class Communicator : MonoBehaviour {
 	/* Async function so that game continues while we wait for the hardware
 	 * to send flex data
 	 */
-	public IEnumerator ReadFromArduino (Action<string> callback) {
+	public IEnumerator ReadFromArduino (Action<string> callback, int maxAttempts) {
 		string dataString = null;
 		int attempts = 0;
 
@@ -169,7 +186,7 @@ public class Communicator : MonoBehaviour {
 				yield break;
 			} else {
 				Debug.Log("noread");
-				if (++attempts > 50) {
+				if (maxAttempts > 0 && ++attempts > maxAttempts) {
 					reading = false;
 					yield break;
 				}
@@ -219,40 +236,9 @@ public class Communicator : MonoBehaviour {
 		vibes.pinky = 0;
 	}
 
-
-	void calibrateMax() {
-		string response = null;
-
-		WriteToArduino((short) 0x0100);
-
-		while (String.IsNullOrEmpty(response)) {
-			try {
-				/* read a string from the stream */
-				response = stream.ReadLine ();
-			} catch (TimeoutException) {
-				response = null;
-			}
-		}
-
-		calibration = 0;
-	}
-
-	void calibrateMin() {
-		string response = null;
-
-		WriteToArduino((short) 0x0010);
-
-		while (String.IsNullOrEmpty(response)) {
-			try {
-				/* read a string from the stream */
-				response = stream.ReadLine ();
-			} catch (TimeoutException) {
-				response = null;
-			}
-		}
-		// pause for a second?
-
-		calibration = 1;
+	void emptyFunction(string inData) {
+		Debug.Log(calibration + " From Arduino: " + inData);
+		calibration++;
 	}
 
 } /* END COMMUNICATOR CLASS */

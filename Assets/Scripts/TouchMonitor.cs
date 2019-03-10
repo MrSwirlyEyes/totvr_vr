@@ -23,7 +23,7 @@ public class TouchMonitor : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision) {
-		Debug.Log ("Entered " + collision.contacts[0].thisCollider.name);
+//		Debug.Log ("Entered " + collision.contacts[0].thisCollider.name);
 		pressure = (short) (collision.impulse / Time.deltaTime).magnitude;
 	}
 
