@@ -66,7 +66,7 @@ public class Communicator : MonoBehaviour {
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
-	private int calibration = 4;
+	private int calibration = -1;
 
 	
 	/* Set the global instance of the Communicator and open the stream to the hardware */
@@ -112,7 +112,7 @@ public class Communicator : MonoBehaviour {
 		
 		// skip 2 - 2 waits for readfromarduino to finish
 		} else if (calibration == 3) {
-			instructions.text = "Calibration complete!";
+			instructions.text = "";
 			calibration++;
 		} else if (calibration == 4) {
 			if (communicating && !reading) {

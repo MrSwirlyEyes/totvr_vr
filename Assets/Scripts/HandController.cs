@@ -53,9 +53,9 @@ public class HandController : MonoBehaviour {
 		if (Communicator.instance.bending) {
 //			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
 			int thumbRot = maxRot - Communicator.instance.knuckles.thumb;
-			thumb1.localEulerAngles = new Vector3 (0, 50, thumbRot/4);
-			thumb2.localEulerAngles = new Vector3 (0, 0, thumbRot);
-			thumb3.localEulerAngles = new Vector3 (0, 0, thumbRot);
+			thumb1.localEulerAngles = new Vector3 (-thumbRot/2, thumbRot/4, thumbRot/3);
+			thumb2.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/3, thumbRot/4);
+			thumb3.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/4, thumbRot/3);
 
 //			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
 			int indexRot = maxRot - Communicator.instance.knuckles.index;
