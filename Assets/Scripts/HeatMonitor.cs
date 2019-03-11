@@ -19,6 +19,7 @@ public class HeatMonitor : MonoBehaviour {
 
 	void OnTriggerEnter(Collider other) {
 		if (other.GetComponentInParent<HeatSource> ()) {
+			Debug.Log("Adding Source " + other.name);
 			sources.Add (other);
 		}
 	}
@@ -26,6 +27,7 @@ public class HeatMonitor : MonoBehaviour {
 
 
 	void OnTriggerExit(Collider other) {
+		Debug.Log("Losing Source " + other.name);
 		sources.Remove (other);
 	}
 	
@@ -42,6 +44,8 @@ public class HeatMonitor : MonoBehaviour {
 
 		int temperature; float emissionDistance;
 
+//		Debug.Log("Num Sources: " + sources.Count);
+
 		foreach (Collider source in sources) {
 			temperature = source.GetComponentInParent<HeatSource> ().temperature;
 			emissionDistance = source.GetComponentInParent<HeatSource> ().emissionDistance;
@@ -53,13 +57,14 @@ public class HeatMonitor : MonoBehaviour {
 			middleSum += distToHeat(Vector3.Distance (middle.transform.position, source.ClosestPointOnBounds(middle.transform.position)), temperature, emissionDistance);
 			ringSum += distToHeat(Vector3.Distance (ring.transform.position, source.ClosestPointOnBounds(ring.transform.position)), temperature, emissionDistance);
 			pinkySum += distToHeat(Vector3.Distance (pinky.transform.position, source.ClosestPointOnBounds(pinky.transform.position)), temperature, emissionDistance);
+
 		}
 			
-		Communicator.instance.heats.thumb = map((short) (thumbSum / sources.Count),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.index = map((short) (indexSum / sources.Count),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.middle = map((short) (middleSum / sources.Count),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.ring = map((short) (ringSum / sources.Count),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.pinky = map((short) (pinkySum / sources.Count),temp_min, temp_max, tec_min, tec_max);
+		Communicator.instance.heats.thumb = map((short) (thumbSum),temp_min, temp_max, tec_min, tec_max);
+		Communicator.instance.heats.index = map((short) (indexSum),temp_min, temp_max, tec_min, tec_max);
+		Communicator.instance.heats.middle = map((short) (middleSum),temp_min, temp_max, tec_min, tec_max);
+		Communicator.instance.heats.ring = map((short) (ringSum),temp_min, temp_max, tec_min, tec_max);
+		Communicator.instance.heats.pinky = map((short) (pinkySum),temp_min, temp_max, tec_min, tec_max);
 
 //		Debug.Log ("Temperatures: " + Communicator.instance.heats.thumb + ',' 
 //									+ Communicator.instance.heats.index + ','
@@ -84,10 +89,15 @@ public class HeatMonitor : MonoBehaviour {
 	}
 		
 	short map(short x, short in_min, short in_max, short out_min, short out_max) {
+		
 		float slope = (float)(out_max - out_min)/(in_max-in_min);
-		float stretched = slope * (x-in_min);
+		float stretched = slope * (x);
 		short returnable = (short) stretched;
-
+//		Debug.Log("x: " + x);
+//		Debug.Log("slope: " + slope);
+//		Debug.Log("returnable: " + returnable);
+//		Debug.Log("out_min: " + out_min);
+//		Debug.Log("out_max: " + out_max);
 		if (returnable > out_max)
 			return out_max;
 		if (returnable < out_min)

@@ -66,7 +66,7 @@ public class Communicator : MonoBehaviour {
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
-	private int calibration = -1;
+	private int calibration = 4;
 
 	
 	/* Set the global instance of the Communicator and open the stream to the hardware */
