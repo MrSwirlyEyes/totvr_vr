@@ -11,6 +11,8 @@ using System.Collections;
 using System.Reflection;
 using System.IO.Ports;
 using UnityEngine.UI;
+using System.Runtime.InteropServices;
+
 
 public class Communicator : MonoBehaviour {
 
@@ -39,38 +41,60 @@ public class Communicator : MonoBehaviour {
 
 	/* Stores flex sensor values received from glove to be applied to hand model knuckles */
 	public struct KnuckleValues {
-		public int index, middle, ring, pinky, thumb;
+		public int[] knuckles;
+
+		public KnuckleValues(int size){
+			knuckles = new int[size];
+		}
 	}
 
 	/* Stores in-game pressure to be sent to glove vibe motors */
-	public struct VibeValues {
-		public short index, middle, ring, pinky, thumb;
+//	public struct VibeValues {
+//		public short index, middle, ring, pinky, thumb;
+//	}
+//
+//	/* stores in-game heat to be sent to glove TECss */
+//	public struct HeatValues {
+//		public short index, middle, ring, pinky, thumb;
+//	}
+//
+//	public struct DirectionValues {
+//		public short index, middle, ring, pinky, thumb;
+//	}
+
+	public struct TouchGlovePkt {
+		public short msgType;
+		public short[] vibes;
+		public short[] heats;
+		public short[] dires;
+
+		public TouchGlovePkt(int size) {
+			msgType = 0;
+			vibes = new short[size];
+			heats = new short[size];
+			dires = new short[size];
+		}
 	}
 
-	/* stores in-game heat to be sent to glove TECss */
-	public struct HeatValues {
-		public short index, middle, ring, pinky, thumb;
-	}
+	public TouchGlovePkt outpkt = new TouchGlovePkt(5);
+	public KnuckleValues inpkt = new KnuckleValues(5);
 
-	public struct DirectionValues {
-		public short index, middle, ring, pinky, thumb, wrist;
-	}
-
-	public KnuckleValues knuckles;
-	public VibeValues vibes;
-	public HeatValues heats;
-	public DirectionValues dires;
+//	public KnuckleValues knuckles;
+//	public VibeValues vibes;
+//	public HeatValues heats;
+//	public DirectionValues dires;
 
 	/* tracks whether we are waiting for a response from the glove, to ensure clean handoffs
 	 * we exchange between reading and writing - attempting both concurrently caused significant
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
-	private int calibration = 4;
+	private int calibration = -1;
 
 	
 	/* Set the global instance of the Communicator and open the stream to the hardware */
 	void Start () {
+
 		if (instance == null) {
 			instance = this;
 		} else if (instance != this) {
@@ -140,18 +164,45 @@ public class Communicator : MonoBehaviour {
 		stream.Close ();
 	}
 
+	public short getDirectionByte() {
+		int directions = 0;
+		for (int i = 0; i < outpkt.dires.Length; i++) {
+			directions += outpkt.dires[i]*(2^i);
+		}
+		return (short) directions;
+	}
 
 	/* Write bytes to the hardware */
 	public void WriteToArduino(short msgType) {
+//		Debug.Log("heats: " + outpkt.heats[0] + "," + outpkt.heats[1] + "," + outpkt.heats[2] + "," + outpkt.heats[3] + "," + outpkt.heats[4]);
+//		Debug.Log("vibes: " + outpkt.vibes[0] + "," + outpkt.vibes[1] + "," + outpkt.vibes[2] + "," + outpkt.vibes[3] + "," + outpkt.vibes[4]);
+//		Debug.Log("dires: " + outpkt.dires[0] + "," + outpkt.dires[1] + "," + outpkt.dires[2] + "," + outpkt.dires[3] + "," + outpkt.dires[4]);
+
+		outpkt.msgType = msgType;
+		short directions = getDirectionByte();
+
+//		int size = Marshal.SizeOf(outpkt);
+//		byte[] bytes = new byte[size];
+//
+//		IntPtr ptr = Marshal.AllocHGlobal(size);
+//		Marshal.StructureToPtr(outpkt, ptr, true);
+//		Marshal.Copy(ptr, bytes, 0, size);
+//		Marshal.FreeHGlobal(ptr);
+
+
+
 		short[] sendValues = new short[] {	msgType,
-											vibes.thumb, vibes.index, vibes.middle, vibes.ring, vibes.pinky,
-											heats.thumb, heats.index, heats.middle, heats.ring, heats.pinky
-											/* dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky, dires.wrist */ };
-		byte[] bytes = new byte[sendValues.Length * sizeof(short)];
+			outpkt.vibes[0], outpkt.vibes[1], outpkt.vibes[2], outpkt.vibes[3], outpkt.vibes[4],
+			outpkt.heats[0], outpkt.heats[1], outpkt.heats[2], outpkt.heats[3], outpkt.heats[4],
+			directions
+											/*dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky*/
+										 };
+		int size = sendValues.Length * sizeof(short);
+		byte[] bytes = new byte[size];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
-		Debug.Log ("Writing " + sendValues[0] + ',' + sendValues[1] + ',' + sendValues[2] + ',' + sendValues[3] + ',' + sendValues[4] + ',' + sendValues[5] + ','
-								+ sendValues[6] + ',' + sendValues[7] + ',' + sendValues[8] + ',' + sendValues[9] + ',' + sendValues[10]);
-		stream.Write(bytes,0,bytes.Length);
+		stream.Write(bytes,0,size);
+
+//		Debug.Log ("Writing " + sendValues[11] + ',' + sendValues[12] + ',' + sendValues[13] + ',' + sendValues[14] + ',' + sendValues[15]);
 	}
 
 
@@ -184,6 +235,7 @@ public class Communicator : MonoBehaviour {
 			if (dataString != null) {
 				callback (dataString);
 				reading = false;
+				//stream.Flush();
 				yield break;
 			} else {
 				Debug.Log("noread");
@@ -207,11 +259,13 @@ public class Communicator : MonoBehaviour {
 
 		if (values.Length == 5) {
 			try {
-				knuckles.thumb	= System.Convert.ToInt32 (values [0]);
-				knuckles.index	= System.Convert.ToInt32 (values [1]);
-				knuckles.middle	= System.Convert.ToInt32 (values [2]);
-				knuckles.ring	= System.Convert.ToInt32 (values [3]);
-				knuckles.pinky	= System.Convert.ToInt32 (values [4]);
+				for (int i = 0; i < values.Length; i++) {
+					inpkt.knuckles[i] = System.Convert.ToInt32 (values [i]);
+				}
+//				knuckles.index	= System.Convert.ToInt32 (values [1]);
+//				knuckles.middle	= System.Convert.ToInt32 (values [2]);
+//				knuckles.ring	= System.Convert.ToInt32 (values [3]);
+//				knuckles.pinky	= System.Convert.ToInt32 (values [4]);
 			} catch {
 			}
 		}
@@ -224,17 +278,18 @@ public class Communicator : MonoBehaviour {
 
 	/* Initialize game env until we receive/write first hardware interaction */
 	void setDefaults() {
-		knuckles.thumb = 40;
-		knuckles.index = 40;
-		knuckles.middle = 40;
-		knuckles.ring = 40;
-		knuckles.pinky = 40;
+		for (int i = 0; i < inpkt.knuckles.Length; i++) {
+			inpkt.knuckles[i] = 40;
+			outpkt.vibes[i] = 0;
+			outpkt.heats[i] = 0;
+			outpkt.dires[i] = 0;
+		}
 
-		vibes.thumb = 0;
-		vibes.index = 0;
-		vibes.middle = 0;
-		vibes.ring = 0;
-		vibes.pinky = 0;
+//		knuckles.thumb = 40;
+//		knuckles.index = 40;
+//		knuckles.middle = 40;
+//		knuckles.ring = 40;
+//		knuckles.pinky = 40;
 	}
 
 	void emptyFunction(string inData) {

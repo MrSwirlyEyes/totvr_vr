@@ -20,7 +20,7 @@ public class HandController : MonoBehaviour {
 //	int [] fingerRange		= { 0, 90 };
 //	int [] thRange			= { 0, 90 };
 
-	short maxRot = 90;
+//	short maxRot = 90;
 	/* For each finger, knuckle 1 is closest to the palm
 	 * knuckle 3 right below the fingernail
 	 */
@@ -52,31 +52,36 @@ public class HandController : MonoBehaviour {
 	void Update () {
 		if (Communicator.instance.bending) {
 //			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
-			int thumbRot = maxRot - Communicator.instance.knuckles.thumb;
+//			int thumbRot = maxRot - Communicator.instance.inpkt.knuckles[0];
+			int thumbRot = Communicator.instance.inpkt.knuckles[0];
 			thumb1.localEulerAngles = new Vector3 (-thumbRot/2, thumbRot/4, thumbRot/3);
 			thumb2.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/3, thumbRot/4);
 			thumb3.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/4, thumbRot/3);
 
 //			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
-			int indexRot = maxRot - Communicator.instance.knuckles.index;
+//			int indexRot = maxRot - Communicator.instance.inpkt.knuckles[1];
+			int indexRot = Communicator.instance.inpkt.knuckles[1];
 			index1.localEulerAngles = new Vector3 (0, 50, indexRot);
 			index2.localEulerAngles = new Vector3 (0, 0, indexRot);
 			index3.localEulerAngles = new Vector3 (0, 0, indexRot/2);
 
 //			int middleRot = mapInvert (Communicator.instance.knuckles.middle, middleRange [0], middleRange [1], fingerRange[0], fingerRange[1]);
-			int middleRot = maxRot - Communicator.instance.knuckles.middle;
+//			int middleRot = maxRot - Communicator.instance.inpkt.knuckles[2];
+			int middleRot = Communicator.instance.inpkt.knuckles[2];
 			middle1.localEulerAngles = new Vector3 (0, 50, middleRot);
 			middle2.localEulerAngles = new Vector3 (0, 0, middleRot);
 			middle3.localEulerAngles = new Vector3 (0, 0, middleRot/2);
 
 //			int ringRot = mapInvert (Communicator.instance.knuckles.ring, ringRange [0], ringRange [1], fingerRange[0], fingerRange[1]);
-			int ringRot = maxRot - Communicator.instance.knuckles.ring;
+//			int ringRot = maxRot - Communicator.instance.inpkt.knuckles[3];
+			int ringRot = Communicator.instance.inpkt.knuckles[3];
 			ring1.localEulerAngles = new Vector3 (0, 50, ringRot);
 			ring2.localEulerAngles = new Vector3 (0, 0, ringRot);
 			ring3.localEulerAngles = new Vector3 (0, 0, ringRot/2);
 
 //			int pinkyRot = mapInvert (Communicator.instance.knuckles.pinky, pinkyRange [0], pinkyRange [1], fingerRange[0], fingerRange[1]);
-			int pinkyRot = maxRot - Communicator.instance.knuckles.pinky;
+//			int pinkyRot = maxRot - Communicator.instance.inpkt.knuckles[4];
+			int pinkyRot = Communicator.instance.inpkt.knuckles[4];
 			pinky1.localEulerAngles = new Vector3 (0, 50, pinkyRot);
 			pinky2.localEulerAngles = new Vector3 (0, 0, pinkyRot);
 			pinky3.localEulerAngles = new Vector3 (0, 0, pinkyRot/2);

@@ -9,8 +9,8 @@ public class HeatMonitor : MonoBehaviour {
 	public Collider thumb, index, middle, ring, pinky;
 	public Text thumbText, indexText, middleText, ringText, pinkyText;
 
-	public short tec_max = 4095;
-	public short tec_min = -4095;
+	public short tec_max = 1024;
+	public short tec_min = -1024;
 
 	public short temp_min = -100;
 	public short temp_max = 100;
@@ -60,11 +60,13 @@ public class HeatMonitor : MonoBehaviour {
 
 		}
 			
-		Communicator.instance.heats.thumb = map((short) (thumbSum),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.index = map((short) (indexSum),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.middle = map((short) (middleSum),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.ring = map((short) (ringSum),temp_min, temp_max, tec_min, tec_max);
-		Communicator.instance.heats.pinky = map((short) (pinkySum),temp_min, temp_max, tec_min, tec_max);
+		if (Communicator.instance.heating) {
+			Communicator.instance.outpkt.heats[0] = map((short) (thumbSum),temp_min, temp_max, tec_min, tec_max);
+			Communicator.instance.outpkt.heats[1] = map((short) (indexSum),temp_min, temp_max, tec_min, tec_max);
+			Communicator.instance.outpkt.heats[2] = map((short) (middleSum),temp_min, temp_max, tec_min, tec_max);
+			Communicator.instance.outpkt.heats[3] = map((short) (ringSum),temp_min, temp_max, tec_min, tec_max);
+			Communicator.instance.outpkt.heats[4] = map((short) (pinkySum),temp_min, temp_max, tec_min, tec_max);
+		}
 
 //		Debug.Log ("Temperatures: " + Communicator.instance.heats.thumb + ',' 
 //									+ Communicator.instance.heats.index + ','

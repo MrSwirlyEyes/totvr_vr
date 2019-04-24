@@ -1,9 +1,11 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\HeatMonitor.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Communicator.cs">
     <Files>
-      <File FileName="Assets\Scripts\TouchMonitor.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\HeatMonitor.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\TouchMonitor.cs" Line="101" Column="46" />
+      <File FileName="Assets\Scripts\HeatMonitor.cs" Line="69" Column="4" />
+      <File FileName="Assets\Scripts\Communicator.cs" Line="92" Column="30" />
+      <File FileName="Assets\Scripts\HandController.cs" Line="23" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

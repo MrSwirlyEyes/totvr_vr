@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\Communicator.cs" />
+     <Compile Include="Assets\Scripts\GestureHandler.cs" />
      <Compile Include="Assets\Scripts\HandController.cs" />
      <Compile Include="Assets\Scripts\HeatMonitor.cs" />
      <Compile Include="Assets\Scripts\HeatSource.cs" />
