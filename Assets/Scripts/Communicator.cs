@@ -21,6 +21,8 @@ public class Communicator : MonoBehaviour {
 	public int baudrate = 9600;
 	private SerialPort stream;
 
+	public GameObject tracker = null;
+	public GameObject touchGlove = null;
 
 	/* are we connected to hardware? */
 	public bool communicating = true;
@@ -89,7 +91,7 @@ public class Communicator : MonoBehaviour {
 	 * delay in Unity's performance
 	 */
 	private bool reading = false;
-	private int calibration = -1;
+	private int calibration;
 
 	
 	/* Set the global instance of the Communicator and open the stream to the hardware */
@@ -100,6 +102,17 @@ public class Communicator : MonoBehaviour {
 		} else if (instance != this) {
 			Destroy (gameObject);
 		}
+
+		if (calibrate) {
+			calibration = -1;
+		} else {
+			calibration = 4;
+		}
+
+//		FixedJoint fx = tracker.AddComponent<FixedJoint>();
+//		fx.breakForce = 50000;
+//		fx.breakTorque = 50000;
+//		fx.connectedBody = touchGlove.GetComponent<Rigidbody>();
 
 		if (communicating) {
 			Open ();

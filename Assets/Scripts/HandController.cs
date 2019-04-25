@@ -8,6 +8,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using System.Linq;
 
 public class HandController : MonoBehaviour {
 
@@ -47,9 +49,54 @@ public class HandController : MonoBehaviour {
 	public Transform thumb2;
 	public Transform thumb3;
 
+	public GameObject tracker;
+	protected const float VelocityMagic = 6000f;
+	protected const float AngularVelocityMagic = 50f;
+	public const float ExpectedDeltaTime = 0.0111f;
+	protected const float MaxVelocityChange = 10f;
+	protected const float MaxAngularVelocityChange = 50f;
+
+	public Rigidbody rb;
+
+	void Start() {
+//		rb = gameobject.GetComponent<Rigidbody>();
+	}
 
 	/* Bend the fingers in accordance with the values read from hardware */
 	void Update () {
+		float velocityMagic = VelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
+		float angularVelocityMagic = AngularVelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
+
+		Vector3 positionDelta;
+		Quaternion rotationDelta;
+
+		float angle;
+		Vector3 axis;
+
+		positionDelta = (tracker.transform.position - rb.position);
+		rotationDelta = tracker.transform.rotation * Quaternion.Inverse(rb.rotation);
+
+
+		Vector3 velocityTarget = (positionDelta * velocityMagic) * Time.deltaTime;
+		if (float.IsNaN(velocityTarget.x) == false)
+		{
+			rb.velocity = Vector3.MoveTowards(rb.velocity, velocityTarget, MaxVelocityChange);
+		}
+
+		rotationDelta.ToAngleAxis(out angle, out axis);
+
+		if (angle > 180)
+			angle -= 360;
+
+		if (angle != 0) {
+			Vector3 angularTarget = angle * axis;
+			if (float.IsNaN(angularTarget.x) == false) {
+				angularTarget = (angularTarget * angularVelocityMagic) * Time.deltaTime;
+				rb.angularVelocity = Vector3.MoveTowards(rb.angularVelocity, angularTarget, MaxAngularVelocityChange);
+			}
+		}
+
+
 		if (Communicator.instance.bending) {
 //			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
 //			int thumbRot = maxRot - Communicator.instance.inpkt.knuckles[0];
