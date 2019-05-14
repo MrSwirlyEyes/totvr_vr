@@ -9,8 +9,8 @@ public class HeatMonitor : MonoBehaviour {
 	public Collider thumb, index, middle, ring, pinky;
 	public Text thumbText, indexText, middleText, ringText, pinkyText;
 
-	public short tec_max = 1024;
-	public short tec_min = -1024;
+	public short tec_max = 4095;
+	public short tec_min = -4095;
 
 	public short temp_min = -100;
 	public short temp_max = 100;
@@ -27,8 +27,10 @@ public class HeatMonitor : MonoBehaviour {
 
 
 	void OnTriggerExit(Collider other) {
-		Debug.Log("Losing Source " + other.name);
-		sources.Remove (other);
+		if (other.GetComponentInParent<HeatSource> ()) {
+			Debug.Log("Losing Source " + other.name);
+			sources.Remove (other);
+		}
 	}
 	
 
@@ -51,7 +53,7 @@ public class HeatMonitor : MonoBehaviour {
 			emissionDistance = source.GetComponentInParent<HeatSource> ().emissionDistance;
 
 //			Debug.Log ("Dist: " + Vector3.Distance (thumb.transform.position, source.transform.position));
-
+			Debug.Log(source.name + " : " + distToHeat(Vector3.Distance (index.transform.position, source.ClosestPointOnBounds(index.transform.position)), temperature, emissionDistance));
 			thumbSum += distToHeat(Vector3.Distance (thumb.transform.position, source.ClosestPointOnBounds(thumb.transform.position)), temperature, emissionDistance);
 			indexSum += distToHeat(Vector3.Distance (index.transform.position, source.ClosestPointOnBounds(index.transform.position)), temperature, emissionDistance);
 			middleSum += distToHeat(Vector3.Distance (middle.transform.position, source.ClosestPointOnBounds(middle.transform.position)), temperature, emissionDistance);
@@ -66,20 +68,12 @@ public class HeatMonitor : MonoBehaviour {
 			Communicator.instance.outpkt.heats[2] = map((short) (middleSum),temp_min, temp_max, tec_min, tec_max);
 			Communicator.instance.outpkt.heats[3] = map((short) (ringSum),temp_min, temp_max, tec_min, tec_max);
 			Communicator.instance.outpkt.heats[4] = map((short) (pinkySum),temp_min, temp_max, tec_min, tec_max);
+			thumbText.text = Convert.ToString(Communicator.instance.outpkt.heats[0], 10);
+			indexText.text = Convert.ToString(Communicator.instance.outpkt.heats[1], 10);
+			middleText.text = Convert.ToString(Communicator.instance.outpkt.heats[2], 10);
+			ringText.text = Convert.ToString(Communicator.instance.outpkt.heats[3], 10);
+			pinkyText.text = Convert.ToString(Communicator.instance.outpkt.heats[4], 10);
 		}
-
-//		Debug.Log ("Temperatures: " + Communicator.instance.heats.thumb + ',' 
-//									+ Communicator.instance.heats.index + ','
-//									+ Communicator.instance.heats.middle + ','
-//									+ Communicator.instance.heats.ring + ','
-//									+ Communicator.instance.heats.pinky);
-		
-//		thumbText.text = Convert.ToString((short)(thumbSum / sources.Count), 10);
-//		indexText.text = Convert.ToString((short)(indexSum / sources.Count), 10);
-//		middleText.text = Convert.ToString((short)(middleSum / sources.Count), 10);
-//		ringText.text = Convert.ToString((short)(ringSum / sources.Count), 10);
-//		pinkyText.text = Convert.ToString((short)(pinkySum / sources.Count), 10);
-
 	}
 
 	float distToHeat(float dist, int temperature, float emit) {
@@ -95,11 +89,7 @@ public class HeatMonitor : MonoBehaviour {
 		float slope = (float)(out_max - out_min)/(in_max-in_min);
 		float stretched = slope * (x);
 		short returnable = (short) stretched;
-//		Debug.Log("x: " + x);
-//		Debug.Log("slope: " + slope);
-//		Debug.Log("returnable: " + returnable);
-//		Debug.Log("out_min: " + out_min);
-//		Debug.Log("out_max: " + out_max);
+
 		if (returnable > out_max)
 			return out_max;
 		if (returnable < out_min)

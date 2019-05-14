@@ -193,29 +193,14 @@ public class Communicator : MonoBehaviour {
 
 		outpkt.msgType = msgType;
 		short directions = getDirectionByte();
-
-//		int size = Marshal.SizeOf(outpkt);
-//		byte[] bytes = new byte[size];
-//
-//		IntPtr ptr = Marshal.AllocHGlobal(size);
-//		Marshal.StructureToPtr(outpkt, ptr, true);
-//		Marshal.Copy(ptr, bytes, 0, size);
-//		Marshal.FreeHGlobal(ptr);
-
-
-
 		short[] sendValues = new short[] {	msgType,
 			outpkt.vibes[0], outpkt.vibes[1], outpkt.vibes[2], outpkt.vibes[3], outpkt.vibes[4],
 			outpkt.heats[0], outpkt.heats[1], outpkt.heats[2], outpkt.heats[3], outpkt.heats[4],
-			directions
-											/*dires.thumb, dires.index, dires.middle, dires.ring, dires.pinky*/
-										 };
+			directions };
 		int size = sendValues.Length * sizeof(short);
 		byte[] bytes = new byte[size];
 		Buffer.BlockCopy (sendValues, 0, bytes, 0, bytes.Length);
 		stream.Write(bytes,0,size);
-
-//		Debug.Log ("Writing " + sendValues[11] + ',' + sendValues[12] + ',' + sendValues[13] + ',' + sendValues[14] + ',' + sendValues[15]);
 	}
 
 
@@ -251,7 +236,7 @@ public class Communicator : MonoBehaviour {
 				//stream.Flush();
 				yield break;
 			} else {
-				Debug.Log("noread");
+//				Debug.Log("noread");
 				if (maxAttempts > 0 && ++attempts > maxAttempts) {
 					reading = false;
 					yield break;
@@ -282,7 +267,7 @@ public class Communicator : MonoBehaviour {
 			} catch {
 			}
 		}
-		Debug.Log("Receiving " + inData);
+//		Debug.Log("Receiving " + inData);
 
 //		Debug.Log ("Index: " + knuckles.index);
 	}

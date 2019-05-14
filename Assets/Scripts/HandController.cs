@@ -29,6 +29,26 @@ public class HandController : MonoBehaviour {
 	 // These public transforms are assigned to references
 	 // to the Hand Model knuckles in Unity's configuration
 	 // gui, as indicated in figure ##
+//	public Rigidbody index1;
+//	public Rigidbody index2;
+//	public Rigidbody index3;
+//
+//	public Rigidbody middle1;
+//	public Rigidbody middle2;
+//	public Rigidbody middle3;
+//
+//	public Rigidbody ring1;
+//	public Rigidbody ring2;
+//	public Rigidbody ring3;
+//
+//	public Rigidbody pinky1;
+//	public Rigidbody pinky2;
+//	public Rigidbody pinky3;
+//
+//	public Rigidbody thumb1;
+//	public Rigidbody thumb2;
+//	public Rigidbody thumb3;
+
 	public Transform index1;
 	public Transform index2;
 	public Transform index3;
@@ -56,82 +76,56 @@ public class HandController : MonoBehaviour {
 	protected const float MaxVelocityChange = 10f;
 	protected const float MaxAngularVelocityChange = 50f;
 
-	public Rigidbody rb;
+	private int changeThreshold = 7;
+	private int thumbRot = 0;
+	private int indexRot = 0;
+	private int middleRot = 0;
+	private int ringRot = 0;
+	private int pinkyRot = 0;
 
-	void Start() {
-//		rb = gameobject.GetComponent<Rigidbody>();
-	}
+	public Rigidbody rb;
+	private Vector3 posDel;
 
 	/* Bend the fingers in accordance with the values read from hardware */
 	void Update () {
-		float velocityMagic = VelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
-		float angularVelocityMagic = AngularVelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
-
-		Vector3 positionDelta;
-		Quaternion rotationDelta;
-
-		float angle;
-		Vector3 axis;
-
-		positionDelta = (tracker.transform.position - rb.position);
-		rotationDelta = tracker.transform.rotation * Quaternion.Inverse(rb.rotation);
-
-
-		Vector3 velocityTarget = (positionDelta * velocityMagic) * Time.deltaTime;
-		if (float.IsNaN(velocityTarget.x) == false)
-		{
-			rb.velocity = Vector3.MoveTowards(rb.velocity, velocityTarget, MaxVelocityChange);
-		}
-
-		rotationDelta.ToAngleAxis(out angle, out axis);
-
-		if (angle > 180)
-			angle -= 360;
-
-		if (angle != 0) {
-			Vector3 angularTarget = angle * axis;
-			if (float.IsNaN(angularTarget.x) == false) {
-				angularTarget = (angularTarget * angularVelocityMagic) * Time.deltaTime;
-				rb.angularVelocity = Vector3.MoveTowards(rb.angularVelocity, angularTarget, MaxAngularVelocityChange);
-			}
-		}
-
+		updateLinearVelocity(tracker.transform.position, rb.position, rb);
+		updateAngularVelocity(tracker.transform.rotation, rb.rotation, rb);
 
 		if (Communicator.instance.bending) {
-//			int thumbRot = mapInvert (Communicator.instance.knuckles.thumb, thumbRange [0], thumbRange [1], thRange[0], thRange[1]);
-//			int thumbRot = maxRot - Communicator.instance.inpkt.knuckles[0];
-			int thumbRot = Communicator.instance.inpkt.knuckles[0];
-			thumb1.localEulerAngles = new Vector3 (-thumbRot/2, thumbRot/4, thumbRot/3);
-			thumb2.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/3, thumbRot/4);
-			thumb3.localEulerAngles = new Vector3 (-thumbRot/4, thumbRot/4, thumbRot/3);
+			if (Mathf.Abs(thumbRot - Communicator.instance.inpkt.knuckles[0]) > changeThreshold) {
+				thumbRot = Communicator.instance.inpkt.knuckles[0];
+				updateRotation(Quaternion.Euler(-thumbRot/2, thumbRot/4, thumbRot/3), thumb1.rotation, thumb1);
+				updateRotation(Quaternion.Euler(-thumbRot/4, thumbRot/3, thumbRot/4), thumb2.rotation, thumb2);
+				updateRotation(Quaternion.Euler(-thumbRot/4, thumbRot/4, thumbRot/3), thumb3.rotation, thumb3);
+			}
 
-//			int indexRot = mapInvert (Communicator.instance.knuckles.index, indexRange [0], indexRange [1], fingerRange[0], fingerRange[1]);
-//			int indexRot = maxRot - Communicator.instance.inpkt.knuckles[1];
-			int indexRot = Communicator.instance.inpkt.knuckles[1];
-			index1.localEulerAngles = new Vector3 (0, 50, indexRot);
-			index2.localEulerAngles = new Vector3 (0, 0, indexRot);
-			index3.localEulerAngles = new Vector3 (0, 0, indexRot/2);
+			if( Mathf.Abs(indexRot - Communicator.instance.inpkt.knuckles[1]) > changeThreshold) {
+				indexRot = Communicator.instance.inpkt.knuckles[1];
+				updateRotation(Quaternion.Euler(0, 50, indexRot), index1.rotation, index1);
+				updateRotation(Quaternion.Euler(0, 0, indexRot), index2.rotation, index2);
+				updateRotation(Quaternion.Euler(0, 0, indexRot/2), index3.rotation, index3);
+			}
 
-//			int middleRot = mapInvert (Communicator.instance.knuckles.middle, middleRange [0], middleRange [1], fingerRange[0], fingerRange[1]);
-//			int middleRot = maxRot - Communicator.instance.inpkt.knuckles[2];
-			int middleRot = Communicator.instance.inpkt.knuckles[2];
-			middle1.localEulerAngles = new Vector3 (0, 50, middleRot);
-			middle2.localEulerAngles = new Vector3 (0, 0, middleRot);
-			middle3.localEulerAngles = new Vector3 (0, 0, middleRot/2);
+			if ( Mathf.Abs(middleRot - Communicator.instance.inpkt.knuckles[2]) > changeThreshold) {
+				middleRot = Communicator.instance.inpkt.knuckles[2];
+				updateRotation(Quaternion.Euler(0, 50, middleRot), middle1.rotation, middle1);
+				updateRotation(Quaternion.Euler(0, 0, middleRot), middle2.rotation, middle2);
+				updateRotation(Quaternion.Euler(0, 0, middleRot/2), middle3.rotation, middle3);
+			}
 
-//			int ringRot = mapInvert (Communicator.instance.knuckles.ring, ringRange [0], ringRange [1], fingerRange[0], fingerRange[1]);
-//			int ringRot = maxRot - Communicator.instance.inpkt.knuckles[3];
-			int ringRot = Communicator.instance.inpkt.knuckles[3];
-			ring1.localEulerAngles = new Vector3 (0, 50, ringRot);
-			ring2.localEulerAngles = new Vector3 (0, 0, ringRot);
-			ring3.localEulerAngles = new Vector3 (0, 0, ringRot/2);
+			if ( Mathf.Abs(ringRot - Communicator.instance.inpkt.knuckles[3]) > changeThreshold) {
+				ringRot = Communicator.instance.inpkt.knuckles[3];
+				updateRotation(Quaternion.Euler(0, 50, ringRot), ring1.rotation, ring1);
+				updateRotation(Quaternion.Euler(0, 0, ringRot), ring2.rotation, ring2);
+				updateRotation(Quaternion.Euler(0, 0, ringRot/2), ring3.rotation, ring3);
+			}
 
-//			int pinkyRot = mapInvert (Communicator.instance.knuckles.pinky, pinkyRange [0], pinkyRange [1], fingerRange[0], fingerRange[1]);
-//			int pinkyRot = maxRot - Communicator.instance.inpkt.knuckles[4];
-			int pinkyRot = Communicator.instance.inpkt.knuckles[4];
-			pinky1.localEulerAngles = new Vector3 (0, 50, pinkyRot);
-			pinky2.localEulerAngles = new Vector3 (0, 0, pinkyRot);
-			pinky3.localEulerAngles = new Vector3 (0, 0, pinkyRot/2);
+			if ( Mathf.Abs(pinkyRot - Communicator.instance.inpkt.knuckles[4]) > changeThreshold) {
+				pinkyRot = Communicator.instance.inpkt.knuckles[4];
+				updateRotation(Quaternion.Euler(0, 50, pinkyRot), pinky1.rotation, pinky1);
+				updateRotation(Quaternion.Euler(0, 0, pinkyRot), pinky2.rotation, pinky2);
+				updateRotation(Quaternion.Euler(0, 0, pinkyRot/2), pinky3.rotation, pinky3);
+			}
 		}
 	}
 
@@ -160,5 +154,46 @@ public class HandController : MonoBehaviour {
 			return (short)out_min;
 		else
 			return returnable;
+	}
+
+	Vector3 updateLinearVelocity(Vector3 targetPosition, Vector3 currentPosition, Rigidbody object_) {
+		float velocityMagic = VelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
+
+		Vector3 positionDelta = targetPosition - currentPosition;
+		if (positionDelta.magnitude > 1) {
+			object_.MovePosition(targetPosition);
+		} else {
+			Vector3 velocityTarget = (positionDelta * velocityMagic) * Time.deltaTime;
+			if (float.IsNaN(velocityTarget.x) == false)
+			{
+				object_.velocity = Vector3.MoveTowards(object_.velocity, velocityTarget, MaxVelocityChange);
+			}
+		}
+
+		return positionDelta;
+	}
+
+	void updateAngularVelocity(Quaternion targetRotation, Quaternion currentRotation, Rigidbody object_) {
+		float angularVelocityMagic = AngularVelocityMagic / (Time.deltaTime / ExpectedDeltaTime);
+		Quaternion rotationDelta = targetRotation * Quaternion.Inverse(currentRotation);
+
+		float angle;
+		Vector3 axis;
+		rotationDelta.ToAngleAxis(out angle, out axis);
+
+		if (angle > 180)
+			angle -= 360;
+
+		if (angle != 0) {
+			Vector3 angularTarget = angle * axis;
+			if (float.IsNaN(angularTarget.x) == false) {
+				angularTarget = (angularTarget * angularVelocityMagic) * Time.deltaTime;
+				object_.angularVelocity = Vector3.MoveTowards(object_.angularVelocity, angularTarget, MaxAngularVelocityChange);
+			}
+		}
+	}
+
+	void updateRotation(Quaternion targetRotation, Quaternion currentRotation, Transform object_) {
+		object_.localRotation = targetRotation;
 	}
 }

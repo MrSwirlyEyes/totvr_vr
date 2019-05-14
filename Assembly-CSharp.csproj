@@ -53,6 +53,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Real Materials\Showcase\Scripts\Camera_WASD_movement.cs" />
+     <Compile Include="Assets\Real Materials\Showcase\Scripts\LPPV_lighting_update_only_once.cs" />
+     <Compile Include="Assets\RunemarkStudio\DarkFantasyKit [Free]\Readme\Parts\Readme.cs" />
      <Compile Include="Assets\Scripts\Communicator.cs" />
      <Compile Include="Assets\Scripts\GestureHandler.cs" />
      <Compile Include="Assets\Scripts\HandController.cs" />
@@ -233,8 +236,12 @@
      <None Include="Assets\SteamVR\InteractionSystem\Hints\Shaders\ControllerButtonHints.shader" />
      <None Include="Assets\SteamVR\InteractionSystem\Samples\BuggyBuddy\Materials\LightCone.shader" />
      <None Include="Assets\SteamVR\InteractionSystem\Teleport\Shaders\Highlight.shader" />
+     <None Include="Assets\Real Materials\Showcase\Sounds\Seisemic - license.txt" />
+     <None Include="Assets\Materials\3dshader.shader" />
      <None Include="Assets\SteamVR\InteractionSystem\Teleport\Shaders\HighlighGlobal.shader" />
      <None Include="Assets\torch\readme.txt" />
+     <None Include="Assets\UIOverlay.shader" />
+     <None Include="Assets\Real Materials\Showcase\Sounds\Waves background - license.txt" />
      <None Include="Assets\SteamVR\Resources\SteamVR_SphericalProjection.shader" />
      <None Include="Assets\SteamVR\Resources\SteamVR_AlphaOut.shader" />
      <None Include="Assets\SteamVR\readme.txt" />
